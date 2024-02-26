@@ -20,7 +20,7 @@ struct City {
 }
 
 #[derive(Debug, Deserialize)]
-struct Item {
+pub struct Item {
     #[serde(rename = "@type")]
     r#type: String,
     #[serde(rename = "@buy")]
@@ -29,7 +29,8 @@ struct Item {
     sell: f32,
 }
 
-pub async fn _get_vn_gold_price() -> Result<(f32, f32), Box<dyn std::error::Error>> {
+//---------- Functions ----------//
+pub async fn _get_vn_gold_price() -> Result<Item, Box<dyn std::error::Error>> {
     let resp = reqwest::get(GOLD_BASE_URL).await?.text().await?;
 
     // println!("{:#?}", resp);
@@ -41,7 +42,11 @@ pub async fn _get_vn_gold_price() -> Result<(f32, f32), Box<dyn std::error::Erro
     let mut junk_buf: Vec<u8> = Vec::new();
 
     // Setup tuple response: (buy, sell)
-    let mut gold_price: (f32, f32) = (0.0, 0.0);
+    let mut gold_price = Item {
+        r#type: "SJC".to_string(), // Hardcode
+        buy: 0.0,
+        sell: 0.0,
+    };
 
     // The `Reader` does not implement `Iterator` because it outputs borrowed data (`Cow`s)
     loop {
@@ -69,7 +74,8 @@ pub async fn _get_vn_gold_price() -> Result<(f32, f32), Box<dyn std::error::Erro
                         if let Some(items) = city.item {
                             for i in items {
                                 if i.r#type.contains(FILTER_TYPE) {
-                                    gold_price = (i.buy * MULTIPLIER, i.sell * MULTIPLIER)
+                                    gold_price.buy = i.buy * MULTIPLIER;
+                                    gold_price.sell = i.sell * MULTIPLIER;
                                 }
                             }
                         }

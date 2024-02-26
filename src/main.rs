@@ -1,24 +1,35 @@
+mod crypto;
 mod gold;
 mod mutual_funds;
+mod vn_stock;
 
 #[tokio::main]
 async fn main() {
-    print!("-----VESAF Funds-----\n");
+    println!("-----VESAF Funds-----");
     let vinacap_nav = mutual_funds::_get_vinacapital_nav("vesaf").await.unwrap();
-    print!(
-        "{} NAV details:\nCurrent: {}\nHighest: {}\nLowest: {}\n",
-        "VESAF", vinacap_nav[0], vinacap_nav[1], vinacap_nav[2]
-    );
+    println!("{vinacap_nav:#?}",);
 
-    print!("-----E1VFVN30 Funds-----\n");
+    println!("-----E1VFVN30 Funds-----");
     let dragoncap_nav = mutual_funds::_get_dragoncapital_nav("e1vfvn30")
         .await
         .unwrap();
-    print!(
-        "{} NAV details:\nCurrent: {}\n",
-        dragoncap_nav.0, dragoncap_nav.1
-    );
-    print!("-----Gold Price-----\n");
+    println!("{dragoncap_nav:#?}",);
+
+    println!("-----Gold Price-----");
     let gold_price = gold::_get_vn_gold_price().await.unwrap();
-    print!("SJC Buy: {}\nSJC Sell: {}\n", gold_price.0, gold_price.1);
+    println!("{gold_price:#?}");
+
+    println!("-----Crypto Price-----");
+    let token_symbols = vec![
+        "BTCUSDT".to_string(),
+        "ETHUSDT".to_string(),
+        "C98USDT".to_string(),
+    ];
+    let token_tickers = crypto::_get_ticker_change(token_symbols).await.unwrap();
+    println!("{token_tickers:#?}]");
+
+    println!("-----VNStock Price-----");
+    let stock_symbols = vec!["TCB".to_string(), "VCB".to_string(), "FPT".to_string()];
+    let stock_tickers = vn_stock::_get_ticker_change(stock_symbols).await.unwrap();
+    println!("{stock_tickers:#?}");
 }
