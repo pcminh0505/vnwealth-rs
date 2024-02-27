@@ -7,7 +7,7 @@ const DRAGONCAPITAL_BASE_URL: &str = "https://api.dragoncapital.com.vn/nav/getLa
 const VINACAPITAL_BASE_URL: &str = "https://wm.vinacapital.com/wp-admin/admin-ajax.php";
 
 //---------- DragonCapital ----------//
-#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DragonCapitalNAV {
     #[serde(rename = "trade_code")]

@@ -2,7 +2,7 @@ use quick_xml::de::Deserializer;
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::reader::Reader;
 use quick_xml::Writer;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::io::BufRead;
 
 const GOLD_BASE_URL: &str = "https://sjc.com.vn/xml/tygiavang.xml";
@@ -12,14 +12,14 @@ const MULTIPLIER: f32 = 1000000.0;
 
 //---------- Struct Definition ----------//
 // Using quick-xml Deserializer: https://docs.rs/quick-xml/latest/quick_xml/de/index.html
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct City {
     #[serde(rename = "@name")]
     name: String,
     item: Option<Vec<Item>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Item {
     #[serde(rename = "@type")]
     r#type: String,
