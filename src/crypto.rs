@@ -1,10 +1,11 @@
+use reqwest::header::{HeaderMap, USER_AGENT};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 
 //---------- BASE URLs ----------//
 const BINANCE_BASE_URL: &str = "https://api.binance.com/api/v3";
-const COINGECKO_BASE_URL: &str = "https://api.coingecko.com/api/v3";
+const COINGECKO_BASE_URL: &str = "https://api.coingecko.com/api/v3/";
 
 //---------- Struct Definition ----------//
 //---------- Binance 24h Ticker ----------//
@@ -45,13 +46,13 @@ pub struct CoinGeckoItem {
     #[serde(rename = "current_price")]
     pub current_price: f64,
     #[serde(rename = "market_cap")]
-    pub market_cap: f64,
+    pub market_cap: i64,
     #[serde(rename = "market_cap_rank")]
-    pub market_cap_rank: f64,
+    pub market_cap_rank: i64,
     #[serde(rename = "fully_diluted_valuation")]
-    pub fully_diluted_valuation: f64,
+    pub fully_diluted_valuation: Option<i64>,
     #[serde(rename = "total_volume")]
-    pub total_volume: f64,
+    pub total_volume: i64,
     #[serde(rename = "high_24h")]
     pub high_24h: f64,
     #[serde(rename = "low_24h")]
@@ -67,10 +68,10 @@ pub struct CoinGeckoItem {
     #[serde(rename = "circulating_supply")]
     pub circulating_supply: f64,
     #[serde(rename = "total_supply")]
-    pub total_supply: f64,
+    pub total_supply: Option<f64>,
     #[serde(rename = "max_supply")]
-    pub max_supply: f64,
-    pub ath: i64,
+    pub max_supply: Option<f64>,
+    pub ath: f64,
     #[serde(rename = "ath_change_percentage")]
     pub ath_change_percentage: f64,
     #[serde(rename = "ath_date")]
@@ -80,13 +81,19 @@ pub struct CoinGeckoItem {
     pub atl_change_percentage: f64,
     #[serde(rename = "atl_date")]
     pub atl_date: String,
-    pub roi: Value,
+    pub roi: Option<Roi>,
     #[serde(rename = "last_updated")]
     pub last_updated: String,
     #[serde(rename = "sparkline_in_7d")]
     pub sparkline_in_7d: SparklineIn7d,
-    #[serde(rename = "price_change_percentage_7d_in_currency")]
-    pub price_change_percentage_7d_in_currency: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Roi {
+    pub times: f64,
+    pub currency: String,
+    pub percentage: f64,
 }
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -140,7 +147,7 @@ pub async fn _get_ticker_change(
     Ok(tickers)
 }
 
-// TODO: Fix/add Cookie to make HTTP request work (otherwise receive 403 error)
+// Note: CoinGecko API needs UserAgent to bypass blocking
 pub async fn _get_coingecko_market(
 ) -> Result<HashMap<String, TokenPriceChange>, Box<dyn std::error::Error>> {
     let query_params = format!(
@@ -150,14 +157,22 @@ pub async fn _get_coingecko_market(
     let url = format!("{}/coins/markets?{}", COINGECKO_BASE_URL, query_params);
 
     // println!("{url:#?}");
+    let client = reqwest::Client::new();
+    // Create a custom User-Agent string
+    let custom_user_agent = "MyCustomUserAgent/1.0";
+    let mut headers = HeaderMap::new();
+    headers.insert(USER_AGENT, custom_user_agent.parse().unwrap());
 
-    let resp = reqwest::get(url).await?;
-    if resp.status().is_success() {
-        Err(format!(
+    let resp = client.get(url).headers(headers).send().await?;
+
+    if !resp.status().is_success() {
+        let error = format!(
             "Error {} while getting data {:?}",
             &resp.status(),
             resp.text().await.unwrap()
-        ))?
+        );
+
+        Err(error.into())
     } else {
         let res_data = resp.json::<Vec<CoinGeckoItem>>().await?;
         // println!("{res_data:#?}");

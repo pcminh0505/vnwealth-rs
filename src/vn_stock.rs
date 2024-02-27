@@ -1,3 +1,4 @@
+use reqwest::header::{HeaderMap, USER_AGENT};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -128,18 +129,34 @@ async fn _get_vndirect_ticker(
     );
 
     let url = format!("{}stock_prices?{}", VNDIRECT_BASE_URL, query_params);
-
     // println!("{url:#?}");
 
-    let resp = reqwest::get(url).await?.json::<VNDirectResponse>().await?;
+    let client = reqwest::Client::new();
+    // Create a custom User-Agent string
+    let custom_user_agent = "MyCustomUserAgent/1.0";
+    let mut headers = HeaderMap::new();
+    headers.insert(USER_AGENT, custom_user_agent.parse().unwrap());
 
-    println!("{resp:#?}");
+    let resp = client.get(url).headers(headers).send().await?;
 
-    let tickers: HashMap<String, i64> = resp
-        .data
-        .into_iter()
-        .map(|a| (a.code, a.basic_price as i64 * 1000))
-        .collect();
+    if !resp.status().is_success() {
+        let error = format!(
+            "Error {} while getting data {:?}",
+            &resp.status(),
+            resp.text().await.unwrap()
+        );
 
-    Ok(tickers)
+        Err(error.into())
+    } else {
+        let res_data = resp.json::<VNDirectResponse>().await?;
+        // println!("{res_data:#?}");
+
+        let tickers: HashMap<String, i64> = res_data
+            .data
+            .into_iter()
+            .map(|a| (a.code, a.basic_price as i64 * 1000))
+            .collect();
+
+        Ok(tickers)
+    }
 }

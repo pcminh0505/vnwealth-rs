@@ -30,25 +30,28 @@ async fn main() {
     // ];
     // let token_tickers = crypto::_get_ticker_change(token_symbols).await.unwrap();
     // println!("{token_tickers:#?}]");
-    // let market_prices = crypto::_get_coingecko_market().await.unwrap();
-
+    // let market_prices = crypto::_get_coingecko_market().await;
+    // match market_prices {
+    //     Ok(res) => println!("{res:#?}"),
+    //     Err(e) => println!("{e:#?}"),
+    // }
     // println!("-----VNStock Price-----");
-    // Get today's date
-    let today = Local::now();
+    // // Get today's date
+    // let today = Local::now();
 
-    // Format date as YYYY-MM-DD
-    let today_str = format!(
-        "{:04}-{:02}-{:02}",
-        today.year(),
-        today.month(),
-        today.day()
-    );
-    let stock_symbols = vec!["TCB".to_string(), "VCB".to_string(), "FPT".to_string()];
-    let stock_tickers =
-        vn_stock::_get_ticker_change(stock_symbols, VNStockPlatform::VNDIRECT(today_str, None))
-            .await;
-    match stock_tickers {
-        Ok(res) => println!("{res:#?}"),
-        Err(e) => println!("{e:#?}"),
-    }
+    // // Format date as YYYY-MM-DD
+    // let today_str = format!(
+    //     "{:04}-{:02}-{:02}",
+    //     today.year(),
+    //     today.month(),
+    //     today.day()
+    // );
+    // let stock_symbols = vec!["TCB".to_string(), "VCB".to_string(), "FPT".to_string()];
+    // let stock_tickers =
+    //     vn_stock::_get_ticker_change(stock_symbols, VNStockPlatform::VNDIRECT(today_str, None))
+    //         .await;
+    // match stock_tickers {
+    //     Ok(res) => println!("{res:#?}"),
+    //     Err(e) => println!("{e:#?}"),
+    // }
 }
