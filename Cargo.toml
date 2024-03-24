@@ -13,3 +13,4 @@ quick-xml = {version = "0.31.0", features = ["serialize"]}
 serde_json = "1.0.114"
 tokio = { version = "1", features = ["full"] }
 chrono = "0.4.34"
+dotenv = "0.15.0"

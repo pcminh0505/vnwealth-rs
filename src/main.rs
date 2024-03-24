@@ -1,6 +1,7 @@
 mod crypto;
 mod gold;
 mod mutual_funds;
+mod nft;
 mod portfolio;
 mod vn_stock;
 
@@ -10,53 +11,53 @@ use vn_stock::VNStockPlatform;
 
 #[tokio::main]
 async fn main() {
-    let portfolio = Portfolio {
-        name: String::from("My Portfolio"),
-        balance: 10000.0,
-        investment: vec![
-            Investment::Cash(Cash::EmergencyCash(5000.0)),
-            Investment::Cash(Cash::TermDeposit(TermDepositDetail {
-                title: String::from("Travel Saving"),
-                start_date: String::from("2024-02-26"),
-                end_date: String::from("2024-08-26"),
-                interest_rate: 0.05,
-                initial_investment: 3000.0,
-            })),
-            Investment::Asset(Asset::Gold(AssetDetail {
-                avg_buy_price: 50.0,
-                amount: 10.0,
-                current_price: 60.0,
-                title: String::from("Gold"),
-            })),
-            Investment::Asset(Asset::Stock(AssetDetail {
-                avg_buy_price: 100.0,
-                amount: 20.0,
-                current_price: 110.0,
-                title: String::from("Stock"),
-            })),
-        ],
-    };
+    // let portfolio = Portfolio {
+    //     name: String::from("My Portfolio"),
+    //     balance: 10000.0,
+    //     investment: vec![
+    //         Investment::Cash(Cash::EmergencyCash(5000.0)),
+    //         Investment::Cash(Cash::TermDeposit(TermDepositDetail {
+    //             title: String::from("Travel Saving"),
+    //             start_date: String::from("2024-02-26"),
+    //             end_date: String::from("2024-08-26"),
+    //             interest_rate: 0.05,
+    //             initial_investment: 3000.0,
+    //         })),
+    //         Investment::Asset(Asset::Gold(AssetDetail {
+    //             avg_buy_price: 50.0,
+    //             amount: 10.0,
+    //             current_price: 60.0,
+    //             title: String::from("Gold"),
+    //         })),
+    //         Investment::Asset(Asset::Stock(AssetDetail {
+    //             avg_buy_price: 100.0,
+    //             amount: 20.0,
+    //             current_price: 110.0,
+    //             title: String::from("Stock"),
+    //         })),
+    //     ],
+    // };
 
-    let (total_cash_balance, total_asset_balance, balance_by_asset) =
-        portfolio.total_balance_by_investment_type();
-    println!("Total Cash Balance: {}", total_cash_balance);
-    println!("Total Asset Balance: {}", total_asset_balance);
-    println!("Balance by Asset: {:#?}", balance_by_asset);
+    // let (total_cash_balance, total_asset_balance, balance_by_asset) =
+    //     portfolio.total_balance_by_investment_type();
+    // println!("Total Cash Balance: {}", total_cash_balance);
+    // println!("Total Asset Balance: {}", total_asset_balance);
+    // println!("Balance by Asset: {:#?}", balance_by_asset);
 
-    for asset in &portfolio.investment {
-        match asset {
-            Investment::Asset(asset) => match asset {
-                Asset::Gold(detail)
-                | Asset::Stock(detail)
-                | Asset::Crypto(detail)
-                | Asset::MutualFund(detail) => {
-                    let asset_roi = portfolio.asset_roi(detail.avg_buy_price, detail.current_price);
-                    println!("{}: ROI: {:.2}%", detail.title, asset_roi);
-                }
-            },
-            _ => {}
-        }
-    }
+    // for asset in &portfolio.investment {
+    //     match asset {
+    //         Investment::Asset(asset) => match asset {
+    //             Asset::Gold(detail)
+    //             | Asset::Stock(detail)
+    //             | Asset::Crypto(detail)
+    //             | Asset::MutualFund(detail) => {
+    //                 let asset_roi = portfolio.asset_roi(detail.avg_buy_price, detail.current_price);
+    //                 println!("{}: ROI: {:.2}%", detail.title, asset_roi);
+    //             }
+    //         },
+    //         _ => {}
+    //     }
+    // }
     // println!("-----VESAF Funds-----");
     // let vinacap_nav = mutual_funds::_get_vinacapital_nav("vesaf").await.unwrap();
     // println!("{vinacap_nav:#?}",);
@@ -103,4 +104,11 @@ async fn main() {
     //     Ok(res) => println!("{res:#?}"),
     //     Err(e) => println!("{e:#?}"),
     // }
+
+    println!("-----NFT Floor Price-----");
+    let nakamigos_price =
+        nft::_get_nft_floor_price("0xd774557b647330C91Bf44cfEAB205095f7E6c367".to_string())
+            .await
+            .unwrap();
+    println!("{nakamigos_price:#?}");
 }
