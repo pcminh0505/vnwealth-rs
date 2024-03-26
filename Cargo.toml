@@ -14,3 +14,5 @@ serde_json = "1.0.114"
 tokio = { version = "1", features = ["full"] }
 chrono = "0.4.34"
 dotenv = "0.15.0"
+thiserror = "1.0.58"
+num = "0.4.1"

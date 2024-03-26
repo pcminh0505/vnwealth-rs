@@ -1,13 +1,76 @@
+mod errors;
+mod pallets;
 mod portfolio;
 mod price_services;
+mod support;
 
 use chrono::{Datelike, Local};
 
-use price_services::vn_stock::VNStockPlatform;
+use pallets::assets;
+use pallets::assets::_fungible;
+use pallets::system;
+// use price_services::vn_stock::VNStockPlatform;
 use price_services::*;
+
+use crate::support::Dispatch;
+
+pub struct StockAsset {
+    system: system::Pallet<Self>,
+    fungible: _fungible::Pallet<Self>,
+}
+
+pub enum ActionCall {
+    Fungible(assets::_fungible::Call<StockAsset>),
+}
+
+impl pallets::system::Config for StockAsset {
+    type AccountId = String;
+}
+
+impl assets::_fungible::Config for StockAsset {
+    type AssetName = String;
+    type Currency = u128;
+}
+
+impl StockAsset {
+    pub fn new() -> Self {
+        return Self {
+            system: system::Pallet::new(),
+            fungible: assets::_fungible::Pallet::new(),
+        };
+    }
+}
+
+impl crate::support::Dispatch for StockAsset {
+    type Caller = <StockAsset as pallets::system::Config>::AccountId;
+    type Call = ActionCall;
+    // Dispatch a call on behalf of a caller. Increments the caller's nonce.
+    fn dispatch(
+        &mut self,
+        caller: Self::Caller,
+        runtime_call: Self::Call,
+    ) -> support::DispatchResult {
+        match runtime_call {
+            ActionCall::Fungible(call) => self.fungible.dispatch(caller, call),
+        }
+    }
+}
 
 #[tokio::main]
 async fn main() {
+    let mut stock_asset = StockAsset::new();
+
+    let caller = "alice".to_string();
+    stock_asset
+        .dispatch(
+            caller,
+            ActionCall::Fungible(assets::_fungible::Call::Mint {
+                asset_name: "CTG".to_string(),
+                amount: 100,
+            }),
+        )
+        .unwrap();
+
     println!("-----VESAF Funds-----");
     let vinacap_nav = mutual_funds::_get_vinacapital_nav("vesaf").await.unwrap();
     println!("{vinacap_nav:#?}",);
