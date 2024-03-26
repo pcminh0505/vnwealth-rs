@@ -3,9 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 
-//---------- BASE URLs ----------//
-const TCBS_BASE_URL: &str = "https://apipubaws.tcbs.com.vn/tcanalysis/v1/";
-const VNDIRECT_BASE_URL: &str = "https://finfo-api.vndirect.com.vn/v4/";
+use crate::defaults::{TCBS_BASE_URL, VNDIRECT_BASE_URL};
 
 pub enum VNStockPlatform {
     TCBS,
