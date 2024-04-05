@@ -13,6 +13,7 @@ use num::Zero;
 use price_services::*;
 use provider::types::DataProvider;
 
+use crate::provider::alchemy::AlchemyDataProvider;
 use crate::provider::dragon_capital::DragonCapitalDataProvider;
 use crate::provider::sjc::SjcDataProvider;
 use crate::provider::vina_capital::VinaCapitalDataProvider;
@@ -76,6 +77,14 @@ impl FungibleAsset for Gold {
     type Currency = f32;
 }
 
+struct NFT {}
+
+impl FungibleAsset for NFT {
+    // Yes I know it's dumb af
+    type AssetName = String;
+    type Currency = f32;
+}
+
 #[tokio::main]
 async fn main() {
     println!("-----VESAF Price-----");
@@ -98,6 +107,13 @@ async fn main() {
         .await
         .unwrap();
     println!("{gold:#?}");
+
+    println!("-----NFT Price-----");
+    let nakamigos = Investment::<NFT, AlchemyDataProvider>::new()
+        .fetch_asset_price("nakamigos".to_string())
+        .await
+        .unwrap();
+    println!("{nakamigos:#?}");
 
     println!("-----Crypto Price-----");
     let token_symbols = vec![
@@ -131,11 +147,10 @@ async fn main() {
     //     Ok(res) => println!("{res:#?}"),
     //     Err(e) => println!("{e:#?}"),
     // }
-
-    println!("-----NFT Floor Price-----");
-    let nakamigos_price =
-        nft::_get_nft_floor_price("0xd774557b647330C91Bf44cfEAB205095f7E6c367".to_string())
-            .await
-            .unwrap();
-    println!("{nakamigos_price:#?}");
+    // println!("-----NFT Floor Price-----");
+    // let nakamigos_price =
+    //     nft::_get_nft_floor_price("0xd774557b647330C91Bf44cfEAB205095f7E6c367".to_string())
+    //         .await
+    //         .unwrap();
+    // println!("{nakamigos_price:#?}");
 }
