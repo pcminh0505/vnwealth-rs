@@ -5,6 +5,7 @@ mod price_services;
 mod provider;
 
 use crate::provider::alchemy::AlchemyDataProvider;
+use crate::provider::binance::BinanceDataProvider;
 use crate::provider::dragon_capital::DragonCapitalDataProvider;
 use crate::provider::sjc::SjcDataProvider;
 use crate::provider::vina_capital::VinaCapitalDataProvider;
@@ -61,7 +62,7 @@ where
     async fn fetch_asset_price(&self, asset_name: A::AssetName) -> Result<A::Currency> {
         let provider = D::new();
         let output = provider
-            .fetch_asset_prices(Some(asset_name.to_string()))
+            .fetch_asset_price(Some(asset_name.to_string()))
             .await
             .unwrap();
         Ok(output.into())
@@ -71,6 +72,13 @@ where
 struct Gold {}
 
 impl FungibleAsset for Gold {
+    type AssetName = String;
+    type Currency = f32;
+}
+
+struct Crypto {}
+
+impl FungibleAsset for Crypto {
     type AssetName = String;
     type Currency = f32;
 }
@@ -90,35 +98,37 @@ async fn main() {
         .fetch_asset_price("vesaf".to_string())
         .await
         .unwrap();
-    println!("{vesaf_funds:#?}",);
+    println!("VESAF: {vesaf_funds:#?}",);
 
     println!("-----E1VFVN30 Price-----");
     let e1vfvn30_funds = Investment::<Stock, DragonCapitalDataProvider>::new()
         .fetch_asset_price("e1vfvn30".to_string())
         .await
         .unwrap();
-    println!("{e1vfvn30_funds:#?}",);
+    println!("E1VFVN30: {e1vfvn30_funds:#?}",);
 
     println!("-----Gold Price-----");
     let gold = Investment::<Gold, SjcDataProvider>::new()
         .fetch_asset_price("e1vfvn30".to_string())
         .await
         .unwrap();
-    println!("{gold:#?}");
+    println!("SJC Gold: {gold:#?}");
 
     println!("-----NFT Price-----");
     let nakamigos = Investment::<NFT, AlchemyDataProvider>::new()
         .fetch_asset_price("nakamigos".to_string())
         .await
         .unwrap();
-    println!("{nakamigos:#?}");
+    println!("Nakamigos: {nakamigos:#?}");
 
     println!("-----Crypto Price-----");
-    let token_symbols = vec![
-        "BTCUSDT".to_string(),
-        "ETHUSDT".to_string(),
-        "C98USDT".to_string(),
-    ];
+    let eth = Investment::<Crypto, BinanceDataProvider>::new()
+        .fetch_asset_price("eth".to_string())
+        .await
+        .unwrap();
+    println!("ETH: {eth:#?}");
+
+    let token_symbols = vec!["btc".to_string(), "bnb".to_string(), "c98".to_string()];
     let token_tickers = crypto::_get_ticker_change(token_symbols).await.unwrap();
     println!("{token_tickers:#?}]");
     // let market_prices = crypto::_get_coingecko_market().await;

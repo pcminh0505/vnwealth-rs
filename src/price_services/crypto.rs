@@ -115,10 +115,11 @@ pub async fn _get_ticker_change(
         "[{}]",
         symbols
             .iter()
-            .map(|s| format!("\"{}\"", s))
+            .map(|s| format!("\"{}\"", s.to_uppercase().to_owned() + "USDT"))
             .collect::<Vec<_>>()
             .join(",")
     );
+    println!("{symbols_str:#?}");
     let query_params = format!("symbols={}", symbols_str);
     let url = format!(r#"{}/ticker/24hr?{}"#, BINANCE_BASE_URL, query_params);
 
