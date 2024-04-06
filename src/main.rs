@@ -4,19 +4,17 @@ mod portfolio;
 mod price_services;
 mod provider;
 
-use std::fmt::Debug;
-use std::marker::PhantomData;
-use std::ops::{AddAssign, SubAssign};
-
-use anyhow::Result;
-use num::Zero;
-use price_services::*;
-use provider::types::DataProvider;
-
 use crate::provider::alchemy::AlchemyDataProvider;
 use crate::provider::dragon_capital::DragonCapitalDataProvider;
 use crate::provider::sjc::SjcDataProvider;
 use crate::provider::vina_capital::VinaCapitalDataProvider;
+use anyhow::Result;
+use num::Zero;
+use price_services::*;
+use provider::types::DataProvider;
+use std::fmt::Debug;
+use std::marker::PhantomData;
+use std::ops::{AddAssign, SubAssign};
 
 trait FungibleAsset {
     type AssetName: ToString + Debug;
@@ -147,10 +145,4 @@ async fn main() {
     //     Ok(res) => println!("{res:#?}"),
     //     Err(e) => println!("{e:#?}"),
     // }
-    // println!("-----NFT Floor Price-----");
-    // let nakamigos_price =
-    //     nft::_get_nft_floor_price("0xd774557b647330C91Bf44cfEAB205095f7E6c367".to_string())
-    //         .await
-    //         .unwrap();
-    // println!("{nakamigos_price:#?}");
 }

@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-
 use anyhow::Result;
+use reqwest::header::{HeaderMap, USER_AGENT};
 use scraper::{Html, Selector};
+use std::collections::HashMap;
 
 use crate::defaults::VINACAPITAL_BASE_URL;
 
@@ -23,8 +23,15 @@ impl DataProvider for VinaCapitalDataProvider {
         params.insert("action", String::from("getchartfundnav"));
         params.insert("fundname", fund.unwrap().to_uppercase());
         let client = reqwest::Client::new();
+
+        // Create a custom User-Agent string
+        let custom_user_agent = "MyCustomUserAgent/1.0";
+        let mut headers = HeaderMap::new();
+        headers.insert(USER_AGENT, custom_user_agent.parse().unwrap());
+
         let resp = client
             .post(self.base_url.clone())
+            .headers(headers)
             .form(&params)
             .send()
             .await?;
