@@ -1,17 +1,18 @@
 mod cash_flow;
 mod defaults;
+mod market;
 mod portfolio;
-mod price_services;
 mod provider;
 
 use crate::provider::alchemy::AlchemyDataProvider;
 use crate::provider::binance::BinanceDataProvider;
 use crate::provider::dragon_capital::DragonCapitalDataProvider;
 use crate::provider::sjc::SjcDataProvider;
+use crate::provider::tcbs::TCBSDataProvider;
 use crate::provider::vina_capital::VinaCapitalDataProvider;
+use crate::provider::vndirect::VNDirectDataProvider;
 use anyhow::Result;
 use num::Zero;
-use price_services::*;
 use provider::types::DataProvider;
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -20,13 +21,6 @@ use std::ops::{AddAssign, SubAssign};
 trait FungibleAsset {
     type AssetName: ToString + Debug;
     type Currency: Zero + AddAssign + SubAssign + From<f32>;
-}
-
-struct Stock {}
-
-impl FungibleAsset for Stock {
-    type AssetName = String;
-    type Currency = f32;
 }
 
 trait AssetManager<T: FungibleAsset> {
@@ -72,6 +66,13 @@ where
 struct Gold {}
 
 impl FungibleAsset for Gold {
+    type AssetName = String;
+    type Currency = f32;
+}
+
+struct Stock {}
+
+impl FungibleAsset for Stock {
     type AssetName = String;
     type Currency = f32;
 }
@@ -128,31 +129,16 @@ async fn main() {
         .unwrap();
     println!("ETH: {eth:#?}");
 
-    let token_symbols = vec!["btc".to_string(), "bnb".to_string(), "c98".to_string()];
-    let token_tickers = crypto::_get_ticker_change(token_symbols).await.unwrap();
-    println!("{token_tickers:#?}]");
-    // let market_prices = crypto::_get_coingecko_market().await;
-    // match market_prices {
-    //     Ok(res) => println!("{res:#?}"),
-    //     Err(e) => println!("{e:#?}"),
-    // }
     println!("-----VNStock Price-----");
-    // Get today's date
-    // let today = Local::now();
+    let vcb_tcbs = Investment::<Stock, TCBSDataProvider>::new()
+        .fetch_asset_price("vcb".to_string())
+        .await
+        .unwrap();
+    println!("VCB (TCBS): {vcb_tcbs:#?}");
 
-    // Format date as YYYY-MM-DD
-    // let today_str = format!(
-    //     "{:04}-{:02}-{:02}",
-    //     today.year(),
-    //     today.month(),
-    //     today.day()
-    // );
-    // let stock_symbols = vec!["TCB".to_string(), "VCB".to_string(), "FPT".to_string()];
-    // let stock_tickers =
-    //     vn_stock::_get_ticker_change(stock_symbols, VNStockPlatform::VNDIRECT(today_str, None))
-    //         .await;
-    // match stock_tickers {
-    //     Ok(res) => println!("{res:#?}"),
-    //     Err(e) => println!("{e:#?}"),
-    // }
+    let vcb_vndirect = Investment::<Stock, VNDirectDataProvider>::new()
+        .fetch_asset_price("vcb".to_string())
+        .await
+        .unwrap();
+    println!("VCB (VNDirect): {vcb_vndirect:#?}");
 }
