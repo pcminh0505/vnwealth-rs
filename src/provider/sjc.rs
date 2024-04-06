@@ -44,7 +44,7 @@ impl DataProvider for SjcDataProvider {
         };
     }
 
-    async fn fetch_asset_prices(&self, _: Option<String>) -> Result<f32> {
+    async fn fetch_asset_price(&self, _: Option<String>) -> Result<f32> {
         let resp = reqwest::get(self.base_url.clone()).await?.text().await?;
 
         // println!("{:#?}", resp);

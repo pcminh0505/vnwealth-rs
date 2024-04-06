@@ -18,7 +18,7 @@ impl DataProvider for VinaCapitalDataProvider {
         };
     }
 
-    async fn fetch_asset_prices(&self, fund: Option<String>) -> Result<f32> {
+    async fn fetch_asset_price(&self, fund: Option<String>) -> Result<f32> {
         let mut params = HashMap::new();
         params.insert("action", String::from("getchartfundnav"));
         params.insert("fundname", fund.unwrap().to_uppercase());

@@ -16,7 +16,7 @@ impl DataProvider for DragonCapitalDataProvider {
         }
     }
 
-    async fn fetch_asset_prices(&self, fund: Option<String>) -> Result<f32> {
+    async fn fetch_asset_price(&self, fund: Option<String>) -> Result<f32> {
         let url = format!(
             "{}?trade_code={}",
             self.base_url.clone(),

@@ -17,7 +17,7 @@ impl DataProvider for AlchemyDataProvider {
         }
     }
 
-    async fn fetch_asset_prices(&self, collection_slug: Option<String>) -> Result<f32> {
+    async fn fetch_asset_price(&self, collection_slug: Option<String>) -> Result<f32> {
         dotenv().ok(); // Load the .env file
 
         // Read the value from the .env file
@@ -28,7 +28,9 @@ impl DataProvider for AlchemyDataProvider {
 
         let url = format!(
             r#"{}/{}/getFloorPrice?{}"#,
-            ALCHEMY_NFT_BASE_URL, alchemy_api_key, query_params
+            self.base_url.clone(),
+            alchemy_api_key,
+            query_params
         );
 
         let resp = reqwest::get(url)
