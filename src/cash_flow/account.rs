@@ -18,7 +18,7 @@ impl Account {
     // Method to deposit funds into the account
     pub fn deposit(&mut self, amount: f64, description: &str, category: TransactionCategory) {
         self.balance += amount;
-        let transaction = Transaction::new(amount, description, category, None);
+        let transaction = Transaction::new(amount, description, category);
         self.transactions.push(transaction);
     }
 
@@ -31,7 +31,7 @@ impl Account {
     ) -> Result<(), String> {
         if self.balance >= amount {
             self.balance -= amount;
-            let transaction = Transaction::new(-amount, description, category, None);
+            let transaction = Transaction::new(-amount, description, category);
             self.transactions.push(transaction);
             Ok(())
         } else {
@@ -49,11 +49,11 @@ impl Account {
     ) -> Result<(), String> {
         if self.balance >= amount {
             self.balance -= amount;
-            let transaction = Transaction::new(-amount, description, category.clone(), None);
+            let transaction = Transaction::new(-amount, description, category.clone());
             self.transactions.push(transaction);
 
             recipient.balance += amount;
-            let transaction = Transaction::new(amount, description, category, None);
+            let transaction = Transaction::new(amount, description, category);
             recipient.transactions.push(transaction);
 
             Ok(())
